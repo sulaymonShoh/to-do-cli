@@ -1,0 +1,13 @@
+login
+register
+logout
+create_todo
+read_todo
+update_todo
+delete_todo
+todo_list
+block_user
+unblock_user
+block_admin
+unblock_admin
+quit
