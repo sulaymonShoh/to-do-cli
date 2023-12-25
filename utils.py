@@ -7,6 +7,15 @@ red - error
 """
 
 
+class ResponseDate:
+    def __init__(self, data, success:bool=True, status:int=200):
+        self.data = data
+        self.success = success
+        self.status = status
+
+    def __repr__(self):
+        return f"{self.data}:{self.success}"
+
 def print_menu(s: str):
     print(Fore.BLUE, s, Style.RESET_ALL)
 
