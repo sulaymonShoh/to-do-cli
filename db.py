@@ -1,5 +1,6 @@
 import sqlite3
 import time
+import utils, models
 from os.path import exists
 
 db = "db.sqlite"
@@ -21,24 +22,36 @@ def commit(func):
 
 create_table_users_sql = """
 create table if not exists users (
-    id serial PRIMARY KEY,
+    id integer primary key autoincrement,
     username varchar(60),
     password varchar(60),
     status varchar(20),
     role varchar(20),
     login_try_count int default 0
 )
-""" 
+"""
 
 create_todo_sql = """
 create table if not exists todos (
-    id serial PRIMARY KEY,
+    id integer PRIMARY KEY AUTOINCREMENT,
     name varchar(30),
     type varchar(30),
     completer bool default false,
     user_id int references users(id)
 )
 """
+
+insert_into_sql = """
+    insert into users (username, password, status, role) values (?, ?, ?, ?)
+"""
+
+@commit
+def create_admin():
+    cursor.execute(insert_into_sql, ("john",
+                                     utils.encode_password("123"),
+                                     models.UserStatus.ACTIVE.value,
+                                     models.UserRole.ADMIN.value
+                    ))
 
 
 @commit
@@ -49,3 +62,4 @@ def init():
 
 if __name__ == '__main__':
     init()
+    create_admin()
