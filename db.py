@@ -1,14 +1,18 @@
 import sqlite3
 import time
-import utils, models
 from os.path import exists
 
-db = "db.sqlite"
-# while not exists(db):
-#     print(db, "does not exist")
-#     time.sleep(1)
+import models
+import utils
 
-connection = sqlite3.connect(db)
+# import models
+
+db = "db.sqlite"
+while not exists(db):
+    print(db, "-- > doesnot exists")
+    time.sleep(1)
+
+connection = sqlite3.connect("db.sqlite")
 cursor = connection.cursor()
 
 
@@ -21,57 +25,125 @@ def commit(func):
     return wrapper
 
 
-create_table_users_sql = """
-create table if not exists users (
-    id integer primary key autoincrement,
-    username varchar(60) unique not null,
-    password varchar(60) not null,
-    status varchar(20) not null,
-    role varchar(20) not null,
-    login_try_count int default 0
-)
+create_user_table_sql = """
+    create table if not exists users(
+        id integer primary key autoincrement,
+        username varchar(40) unique not null,
+        password varchar(60) not null,
+        status varchar(20) not null,
+        role varchar(20) not null,
+        login_try_count int default 0
+    )
 """
-
 create_todo_sql = """
-create table if not exists todos (
-    id integer PRIMARY KEY AUTOINCREMENT,
-    name varchar(30) not null,
-    type varchar(30) not null,
-    completer bool default false,
-    user_id int references users(id)
+    create table if not exists todos(
+        id integer primary key autoincrement,
+        name varchar(30) not null,
+        type varchar(20) not null,
+        completed bool default false,
+        user_id int references users(id)
 )
 """
-
-insert_into_sql = """
-    insert into users (username, password, status, role) values (?, ?, ?, ?)
-"""
-
+@commit
+def create_todo_init():
+    insert_todo_sql = """
+    insert into todos(name, type,user_id) values (?,?,?);
+    """
+    cursor.execute(insert_todo_sql, ('Study English', "STUDY", 1))
 
 @commit
 def init():
-    cursor.execute(create_table_users_sql)
+    cursor.execute(create_user_table_sql)
     cursor.execute(create_todo_sql)
+
+
+inser_into_sql = """
+    insert into users(username, password, status, role) values (?,?,?,?)
+"""
 
 
 @commit
 def create_admin():
-    cursor.execute(insert_into_sql, ("john",
-                                     utils.encode_password("123"),
-                                     models.UserStatus.ACTIVE.value,
-                                     models.UserRole.ADMIN.value
-                                     ))
+    cursor.execute(inser_into_sql, ("john",
+                                    utils.encode_passrord("123"),
+                                    models.UserStatus.ACTIVE.value,
+                                    models.UserRole.ADMIN.value
+                                    ))
 
 
-def get_user_by_username(username):
-    get_user_sql = """
-        select id, username, status, role, login_try_count from users where username=?
-"""
+@commit
+def update_to_zero_login_try_count(username: str):
+    update_to_zero = "update users set login_try_count=0 where username=?"
+    cursor.execute(update_to_zero, (username,))
+
+
+@commit
+def increase_user_try_count(username):
+    increase_try_count_sql = """update users set login_try_count=login_try_count+1 where username=? """
+    cursor.execute(increase_try_count_sql, (username,))
+
+
+def check_username_unique(username) -> bool:
+    check_sql_unique = """select count(*) from users where username= ?;"""
+    cursor.execute(check_sql_unique, (username,))
+    return cursor.fetchone() != 0
+
+
+def get_user_by_username(username: str):
+    get_user_sql = "select id, username, password, status, role, login_try_count from users where username=?"
     cursor.execute(get_user_sql, (username,))
     user_data = cursor.fetchone()
     return user_data
 
 
-if __name__ == '__main__':
-    # init()
-    # create_admin()
-    print(get_user_by_username("john"))
+@commit
+def update_user_status(username: str):
+    update_user_status_to_active = """update users set status=? where username=?"""
+    cursor.execute(update_user_status_to_active, (models.UserStatus.ACTIVE.value, username))
+
+
+@commit
+def update_user_status_to_inactive(username: str):
+    update_user_status_to_inactive = """update users set status=? where username=?"""
+    cursor.execute(update_user_status_to_inactive, (models.UserStatus.IN_ACTIVE.value, username))
+
+
+@commit
+def block_user(username: str):
+    block_user_sql = """update users set status=? where username=?"""
+    cursor.execute(block_user_sql, (models.UserStatus.BLOCKED.value, username))
+
+
+@commit
+def register_user(user):
+    inser_into_user_sql = """insert into users(id, username, password,status, role, login_try_count) values (?,?,?,?,?,?)"""
+    cursor.execute(inser_into_user_sql,
+                   (user.id, user.username, user.password, user.status, user.role, user.login_try_count))
+
+
+def get_user_id():
+    user_id_seqence = """select seq from sqlite_sequence where name ='users';"""
+    cursor.execute(user_id_seqence)
+    id = 1 + cursor.fetchone()[0]
+    return id
+
+
+def get_todo_id():
+    user_id_seqence = """select seq from sqlite_sequence where name ='todos';"""
+    cursor.execute(user_id_seqence)
+    id = 1 + cursor.fetchone()[0]
+    return id
+
+@commit
+def insert_to_todo_item(todo):
+    insert_todo_sql = """insert into todos(id,name, type, completed, user_id ) values (?,?,?,?,?)"""
+    cursor.execute(insert_todo_sql, (todo.id, todo.name, todo.type, todo.completed, todo.user_id))
+
+
+
+
+# if __name__ == '__main__':
+    # create_todo_init()
+# init()
+# create_admin()
+# print(get_user_by_username("john"))
