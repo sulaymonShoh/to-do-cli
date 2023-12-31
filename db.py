@@ -203,3 +203,7 @@ def block_admin(username):
     block_admin_sql = """update users set status=? where username=?"""
     cursor.execute(block_admin_sql, (models.UserStatus.BLOCKED.value, username))
 
+@commit
+def unblock_admin(username):
+    unblock_admin_sql = """update users set status=? where username=?"""
+    cursor.execute(unblock_admin_sql, (models.UserStatus.IN_ACTIVE.value,))
