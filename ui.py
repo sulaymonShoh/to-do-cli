@@ -1,3 +1,4 @@
+import time
 from getpass import getpass
 
 import db
@@ -16,6 +17,7 @@ def login():
     response: utils.ResponseDate = service.login_user(username, password)
     utils.print_response(response)
     session_user = response.data
+    time.sleep(3)
 
 
 def register():
@@ -24,6 +26,7 @@ def register():
     password2 = getpass("retype password: ")
     response: utils.ResponseDate = service.register_user(username, password1, password2)
     utils.print_response(response)
+    time.sleep(3)
 
 
 def logout():
@@ -44,6 +47,7 @@ def create_todo():
     response: utils.ResponseDate = service.create_todo_service(
         models.Todo(name=name, user_id=session_user.id, type=type))
     utils.print_response(response)
+    time.sleep(3)
 
 
 def update_todo():
@@ -51,7 +55,7 @@ def update_todo():
     todo_id = input("Enter todo id to update: ")
     todo = service.update_todo_service(session_user.id, todo_id)
     utils.print_response(todo)
-    # update status to completed
+    time.sleep(3)
 
 
 def delete_todo():
@@ -59,31 +63,35 @@ def delete_todo():
     todo_id = input("Enter todo id to delete: ")
     response = service.delete_todo_service(session_user.id, todo_id)
     utils.print_response(response)
-    # check todo is completed
+    time.sleep(3)
 
 
 def todo_list():
     global session_user
     result = service.todo_list_service(session_user.id)
     print(result)
+    time.sleep(3)
 
 
 def block_user():
     username = input("Enter username to block: ")
     response = service.block_user_service(username)
     utils.print_response(response)
+    time.sleep(3)
 
 
 def unblock_user():
     username = input("Enter username to unblock: ")
     response = service.unblock_user_service(username)
     utils.print_response(response)
+    time.sleep(3)
 
 
 def block_admin():
     username = input("Enter username of admin to block: ")
     response = service.block_admin_service(username)
     utils.print_response(response)
+    time.sleep(3)
 
 
 def unblock_admin():
@@ -98,7 +106,7 @@ def menu():
     global session_user
 
     while True:
-        if not session_user:
+        if not session_user.role:
             print_menu("=> login")
             print_menu("=> register")
         elif session_user.role == models.UserRole.USER.value:
@@ -124,7 +132,7 @@ def menu():
             print_menu("=> unblock_admin")
             print_menu("=> logout")
         print_menu("=> quit")
-        choice = input("> ?: ")
+        choice = input(" =>: ")
         match choice:
             case "login":
                 login()

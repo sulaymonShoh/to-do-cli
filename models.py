@@ -1,7 +1,8 @@
 import datetime
 import enum
-from typing import Optional
 import db
+from typing import Optional
+from prettytable import PrettyTable
 
 
 class UserRole(enum.Enum):
@@ -64,4 +65,12 @@ class Todo:
         return cls(id=agrs[0], name=agrs[1], type=agrs[2], completed=agrs[3], user_id=agrs[4])
 
     def __repr__(self):
-        return f"Todo ID: {self.id}\n Title: {self.name}\n Type: {self.type}\n Completed: {['No', 'Yes'][self.completed]}"
+        todo_detail = PrettyTable(["Todo", "Details"])
+        todo_detail.align["Todo"] = 'r'
+        todo_detail.align["Details"] = 'l'
+        todo_detail.add_row(["ID", self.id])
+        todo_detail.add_row(["Title", self.name])
+        todo_detail.add_row(["Type", self.type])
+        todo_detail.add_row(["Completed", ['No', 'Yes'][self.completed]])
+
+        return todo_detail.get_string()

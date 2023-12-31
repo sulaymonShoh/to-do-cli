@@ -99,11 +99,13 @@ def update_todo_service(user_id, todo_id):
     todo_details = db.get_todo_info(user_id, todo_id)
     if not todo_details:
         return utils.ResponseDate("Todo does not exist", False)
+    todo_details = db.get_todo_info(user_id, todo_id)
     todo = models.Todo.from_tuple(todo_details)
     if todo.completed:
         return utils.ResponseDate("Todo already completed", False)
     else:
         db.update_todo_status(user_id, todo_id)
+        print(todo)
         return utils.ResponseDate(f'Todo "{todo.name}" completed successfully', True)
 
 
@@ -113,6 +115,7 @@ def delete_todo_service(user_id, todo_id):
         return utils.ResponseDate("Todo does not exist", False)
     todo = models.Todo.from_tuple(todo_details)
     if todo.completed:
+        print(todo)
         db.delete_todo(user_id, todo_id)
         return utils.ResponseDate(f'Todo "{todo.name}" successfully deleted')
     else:
