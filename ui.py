@@ -109,7 +109,7 @@ def menu():
     global session_user
 
     while True:
-        if not session_user.role:
+        if not session_user:
             print_menu("=> login")
             print_menu("=> register")
         elif session_user.role == models.UserRole.USER.value:
