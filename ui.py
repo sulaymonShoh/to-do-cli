@@ -50,7 +50,6 @@ def update_todo():
     global session_user
     todo_id = input("Enter todo id to update: ")
     todo = service.update_todo_service(session_user.id, todo_id)
-    # todo = service.get_todo_info_service(session_user.id, todo_id)
     utils.print_response(todo)
     # update status to completed
 
