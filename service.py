@@ -129,5 +129,24 @@ def block_admin_service(username):
     elif admin.role == models.UserRole.ADMIN.value:
         if admin.status != models.UserStatus.BLOCKED.value:
             return utils.ResponseDate("Bad Request admin is already blocked", False)
+
+        db.block_admin(username)
+        return utils.ResponseDate("Admin blocked successfully")
+
+    elif admin.role != models.UserRole.ADMIN.value:
+        return utils.ResponseDate("Bad Request this user does not have admin rights", False)
+
+
+def unblock_admin_service(username):
+    admin = models.User.from_tuple(db.get_user_by_username(username))
+    if admin is None:
+        return utils.ResponseDate("Bad request ser not found", False)
+    elif admin.role == models.UserRole.ADMIN.value:
+        if admin.status == models.UserStatus.BLOCKED.value:
+            return utils.ResponseDate("Bad Request admin is not blocked", False)
+
+        db.unblock_admin(username)
+        return utils.ResponseDate("Admin is unblocked succefully")
+
     elif admin.role != models.UserRole.ADMIN.value:
         return utils.ResponseDate("Bad Request this user does not have admin rights", False)
