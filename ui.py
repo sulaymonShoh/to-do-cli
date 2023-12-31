@@ -95,7 +95,10 @@ def block_admin():
 
 
 def unblock_admin():
-    pass
+    username = input("Enter username of admin to unblock: ")
+    response = service.unblock_admin_service(username)
+    utils.print_response(response)
+    time.sleep(3)
 
 
 # divide menu according role
