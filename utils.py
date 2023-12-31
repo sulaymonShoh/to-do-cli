@@ -11,7 +11,7 @@ red -> error
 class ResponseDate:
     def __init__(self, data: str, success: bool = True, status: int = 200, ):
         self.data = data
-        self.success = success
+        self.success = success or True
         self.status = status
 
     def __repr__(self):
@@ -37,14 +37,13 @@ def encode_passrord(pwd: str):
     encoded_pwd = password.decode("utf-8")
     return encoded_pwd
 
-def print_response(reponse:ResponseDate):
-    color = Fore.GREEN if reponse.success else Fore.RED
-    print(color, reponse.data, Style.RESET_ALL)
+
+def print_response(response: ResponseDate):
+    color = Fore.GREEN if response.success else Fore.RED
+    print(color, response.data, Style.RESET_ALL)
+
 
 def match_password(passs: str, hpasss: str):
     passs = passs.encode("utf-8")
     hpasss = hpasss.encode("utf-8")
     return checkpw(passs, hpasss)
-
-
-

@@ -39,7 +39,7 @@ def create_todo():
     print_menu("2.WORK")
     print_menu("3.STUDY")
     types = {"1": models.TodoType.PERSONAL.value, "2": models.TodoType.WORK.value, "3": models.TodoType.STUDY.value, }
-    choice = input("choice")
+    choice = input(" => ")
     type = types[choice]
     response: utils.ResponseDate = service.create_todo_service(
         models.Todo(name=name, user_id=session_user.id, type=type))
@@ -47,29 +47,44 @@ def create_todo():
 
 
 def update_todo():
-    pass
+    global session_user
+    todo_id = input("Enter todo id to update: ")
+    todo = service.update_todo_service(session_user.id, todo_id)
+    # todo = service.get_todo_info_service(session_user.id, todo_id)
+    utils.print_response(todo)
     # update status to completed
 
+
 def delete_todo():
-    pass
+    global session_user
+    todo_id = input("Enter todo id to delete: ")
+    response = service.delete_todo_service(session_user.id, todo_id)
+    utils.print_response(response)
     # check todo is completed
 
 
 def todo_list():
-    pass
-    # show onlu one users todos
+    global session_user
+    result = service.todo_list_service(session_user.id)
+    print(result)
 
 
 def block_user():
-    pass
+    username = input("Enter username to block: ")
+    response = service.block_user_service(username)
+    utils.print_response(response)
 
 
 def unblock_user():
-    pass
+    username = input("Enter username to unblock: ")
+    response = service.unblock_user_service(username)
+    utils.print_response(response)
 
 
 def block_admin():
-    pass
+    username = input("Enter username of admin to block: ")
+    response = service.block_admin_service(username)
+    utils.print_response(response)
 
 
 def unblock_admin():
@@ -124,6 +139,8 @@ def menu():
                 update_todo()
             case "delete_todo":
                 delete_todo()
+            case "todo_list":
+                todo_list()
             case "block_user":
                 block_user()
             case "unblock_user":

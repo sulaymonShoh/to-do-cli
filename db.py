@@ -44,12 +44,15 @@ create_todo_sql = """
         user_id int references users(id)
 )
 """
+
+
 @commit
 def create_todo_init():
     insert_todo_sql = """
     insert into todos(name, type,user_id) values (?,?,?);
     """
     cursor.execute(insert_todo_sql, ('Study English', "STUDY", 1))
+
 
 @commit
 def init():
@@ -86,7 +89,7 @@ def increase_user_try_count(username):
 def check_username_unique(username) -> bool:
     check_sql_unique = """select count(*) from users where username= ?;"""
     cursor.execute(check_sql_unique, (username,))
-    return cursor.fetchone() != 0
+    return cursor.fetchone()[0]
 
 
 def get_user_by_username(username: str):
@@ -104,8 +107,8 @@ def update_user_status(username: str):
 
 @commit
 def update_user_status_to_inactive(username: str):
-    update_user_status_to_inactive = """update users set status=? where username=?"""
-    cursor.execute(update_user_status_to_inactive, (models.UserStatus.IN_ACTIVE.value, username))
+    update_user_status_to_inactive_sql = """update users set status=? where username=?"""
+    cursor.execute(update_user_status_to_inactive_sql, (models.UserStatus.IN_ACTIVE.value, username))
 
 
 @commit
@@ -134,16 +137,69 @@ def get_todo_id():
     id = 1 + cursor.fetchone()[0]
     return id
 
+
 @commit
 def insert_to_todo_item(todo):
     insert_todo_sql = """insert into todos(id,name, type, completed, user_id ) values (?,?,?,?,?)"""
     cursor.execute(insert_todo_sql, (todo.id, todo.name, todo.type, todo.completed, todo.user_id))
 
 
+def get_todo_info(user_id, todo_id):
+    get_todo_info_sql = """select * from todos where id=? and user_id=?"""
+    cursor.execute(get_todo_info_sql, (todo_id, int(user_id),))
+    return cursor.fetchone()
+
+
+def get_todo_title(user_id, todo_id):
+    get_todo_title_sql = """select name from todos where id=? and user_id=?"""
+    cursor.execute(get_todo_title_sql, (todo_id, user_id))
+    return cursor.fetchone()[0]
+
+
+def check_todo_completed(user_id, todo_id):
+    check_todo_completed_sql = """select completed from todos where user_id = ? and id = ?"""
+    cursor.execute(check_todo_completed_sql, (user_id, todo_id))
+    return cursor.fetchone()
+
+
+@commit
+def update_todo_status(user_id, todo_id):
+    update_todo_status_sql = """update todos set completed=? where user_id=? and id=?"""
+    cursor.execute(update_todo_status_sql, (True, user_id, todo_id))
+
+
+def get_todo_list(user_id):
+    get_todo_list_sql = """select id, name, type, completed from todos where user_id=?"""
+    cursor.execute(get_todo_list_sql, (user_id,))
+    todos = cursor.fetchall()
+    return todos
+
+
+@commit
+def unblock_user(username):
+    unblock_user_sql = """update users set status=? where username=?"""
+    cursor.execute(unblock_user_sql, (models.UserStatus.IN_ACTIVE.value, username))
 
 
 # if __name__ == '__main__':
-    # create_todo_init()
+# create_todo_init()
 # init()
 # create_admin()
 # print(get_user_by_username("john"))
+@commit
+def delete_todo(user_id, todo_id):
+    delete_todo_sql = """delete from todos where user_id=? and id=?"""
+    cursor.execute(delete_todo_sql, (user_id, todo_id))
+
+
+# def check_user_role(username):
+#     check_user_role_sql = """select role from users where username=?"""
+#     cursor.execute(check_user_role_sql, (username,))
+#     return cursor.fetchone()[0]
+
+
+@commit
+def block_admin(username):
+    block_admin_sql = """update users set status=? where username=?"""
+    cursor.execute(block_admin_sql, (models.UserStatus.BLOCKED.value, username))
+

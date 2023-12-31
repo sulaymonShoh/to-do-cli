@@ -62,3 +62,6 @@ class Todo:
     @classmethod
     def from_tuple(cls, agrs):
         return cls(id=agrs[0], name=agrs[1], type=agrs[2], completed=agrs[3], user_id=agrs[4])
+
+    def __repr__(self):
+        return f"Todo ID: {self.id}\n Title: {self.name}\n Type: {self.type}\n Completed: {['No', 'Yes'][self.completed]}"
