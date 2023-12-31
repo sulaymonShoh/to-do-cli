@@ -42,18 +42,13 @@ def create_todo_service(todo: models.Todo):
 
 
 def todo_list_service(user_id):
-    # result = """NO.  ID     Todo                 Type       Completed\n"""
-    # for i in range(len(todos)):
-    #     result += " {:<4} {:<5} {:<20} {:<10} {:<6}\n".format(i + 1, todos[i][0], todos[i][1], todos[i][2],
-    #                                                           ["No", "Yes"][todos[i][3]])
-    # return result
-
     result = PrettyTable(["No", "ID", "Title", "Type", "Completed"])
     todos = db.get_todo_list(user_id)
     for i in range(len(todos)):
-        result.add_row([i+1, todos[i][0], todos[i][1], todos[i][2], todos[i][3]])
+        result.add_row([i + 1, todos[i][0], todos[i][1], todos[i][2], todos[i][3]])
 
     return result
+
 
 def block_user_service(username):
     userdata = db.get_user_by_username(username)
